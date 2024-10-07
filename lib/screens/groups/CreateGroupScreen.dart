@@ -134,7 +134,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       String userId = currentUser?.uid ?? 'Anonymous'; // Fallback to 'Anonymous' if user not logged in
 
       // Use a default image URL if none was selected
-      String defaultImageUrl = 'https://w1.pngwing.com/pngs/763/154/png-transparent-graduation-student-cartoon-student-group-education-graduate-university-graduation-ceremony-school.png';
+      String defaultImageUrl = 'https://media.istockphoto.com/id/1223631367/vector/multicultural-group-of-people-is-standing-together-team-of-colleagues-students-happy-men-and.jpg?s=612x612&w=0&k=20&c=9Mwxpq9gADCuEyvFxUdmNhlQea5PED-jwCmqtfgdXhU=';
       String groupImageUrl = _groupImageUrl ?? defaultImageUrl;
 
       // Create a new group in Firestore

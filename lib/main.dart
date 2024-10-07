@@ -19,8 +19,7 @@ import 'package:telex/screens/splash_screen.dart';
 import 'package:telex/screens/auth/sign_in_screen.dart';
 
 import 'package:telex/screens/home/home_screen.dart';
-import 'package:telex/screens/group/group_screen.dart';
-import 'package:telex/screens/group/group_post_screen.dart';
+
 void main()async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -44,7 +43,6 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => SignupScreen(),
         '/home': (context) => HomeScreen(),
         '/groups': (context) => GroupFeedScreen(),
-        '/groupPosts': (context) => GroupPostScreen(groupId: ModalRoute.of(context)!.settings.arguments as String),
         '/marketplace': (context) => MarketplaceScreen(),
         '/addGroupPost': (context) => AddGroupPostScreen(groupId: ModalRoute.of(context)!.settings.arguments as String),
         '/addMarketplaceAd': (context) => AddMarketplaceAdScreen(),

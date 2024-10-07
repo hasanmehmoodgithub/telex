@@ -5,26 +5,27 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:telex/screens/groups/CreatePostScreen.dart';
+import 'package:telex/screens/groups/widgets/PostWidget.dart';
 
 class ViewGroupScreen extends StatefulWidget {
   final String groupId;
 
-  ViewGroupScreen({required this.groupId});
+  ViewGroupScreen({super.key, required this.groupId});
 
   @override
-  _ViewGroupScreenState createState() => _ViewGroupScreenState();
+  ViewGroupScreenState createState() => ViewGroupScreenState();
 }
 
-class _ViewGroupScreenState extends State<ViewGroupScreen> {
+class ViewGroupScreenState extends State<ViewGroupScreen> {
   late Future<Map<String, dynamic>?> _groupDetailsFuture;
-  late Future<List<Map<String, dynamic>>> _postsFuture;
+
   bool _isJoined = false;
 
   @override
   void initState() {
     super.initState();
     _groupDetailsFuture = _fetchGroupDetails();
-    _postsFuture = _fetchPosts();
+
   }
 
   Future<Map<String, dynamic>?> _fetchGroupDetails() async {
@@ -59,16 +60,16 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
 
-      appBar: AppBar(title: Text("Group Details")),
+      appBar: AppBar(title: const Text("Group Details")),
       body: FutureBuilder<Map<String, dynamic>?>(
         future: _groupDetailsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return _buildShimmerLoading();
           } else if (snapshot.hasError) {
-            return Center(child: Text("Error loading group details"));
+            return const Center(child: Text("Error loading group details"));
           } else if (!snapshot.hasData) {
-            return Center(child: Text("Group not found"));
+            return const Center(child: Text("Group not found"));
           }
 
           final group = snapshot.data!;
@@ -78,7 +79,7 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
               children: [
                 groupBannerWidget(group),
                 FetchGroupPosts(groupId: widget.groupId),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
               ],
             ),
           );
@@ -86,7 +87,7 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
       ),
      floatingActionButton: _isJoined ?  FloatingActionButton(
         onPressed:  _createPost,// Only allow posting if user has joined the group
-        child:  Icon(Icons.add),
+        child:  const Icon(Icons.add),
       ):null,
       // floatingActionButton: FloatingActionButton(
       //   onPressed: _createPost,
@@ -109,7 +110,7 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
       if (userId == createdBy) {
         // The creator cannot leave the group
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("The creator cannot leave the group.")),
+          const SnackBar(content: Text("The creator cannot leave the group.")),
         );
       } else {
         // Proceed to remove the user from the members list
@@ -118,14 +119,16 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("You have left the group successfully.")),
+          const SnackBar(content: Text("You have left the group successfully.")),
         );
+        Navigator.pop(context);
+        Navigator.pushReplacementNamed(context, "/groups");
 
-        print("User $userId has left the group $groupId.");
+        log("User $userId has left the group $groupId.");
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Group does not exist.")),
+        const SnackBar(content: Text("Group does not exist.")),
       );
     }
   }
@@ -151,19 +154,26 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
               children: [
                 Text(
                   group['name'],
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 Text(
                   group['description'],
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  style: const TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ],
             ),
           ),
-          _isJoined?   MaterialButton(onPressed: (){
-            leaveGroup(context,widget.groupId,FirebaseAuth.instance.currentUser!.uid);
-          },child: Text("Leave Group"),)
-              :SizedBox()
+          _isJoined?   Align(
+            alignment: Alignment.topRight,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: MaterialButton(
+                color: Colors.white.withOpacity(0.3),
+                onPressed: (){leaveGroup(context,widget.groupId,FirebaseAuth.instance.currentUser!.uid);},
+                  child: const Text("Leave Group")),
+            ),
+          )
+              :const SizedBox()
 
         ],
       ),
@@ -178,7 +188,7 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
         itemCount: 5,
         itemBuilder: (context, index) {
           return Card(
-            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             child: Container(
               height: 80,
               color: Colors.white,
@@ -200,7 +210,7 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
 class FetchGroupPosts extends StatelessWidget {
   final String groupId;
 
-  FetchGroupPosts({required this.groupId});
+  FetchGroupPosts({super.key, required this.groupId});
 
   @override
   Widget build(BuildContext context) {
@@ -212,18 +222,21 @@ class FetchGroupPosts extends StatelessWidget {
           .get(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: Padding(
+            padding: EdgeInsets.all(20.0),
+            child: CircularProgressIndicator(),
+          ));
         } else if (snapshot.hasError) {
           return Center(child: Text("Error: ${snapshot.error}"));
         } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return Center(child: Text("No posts available."));
+          return const Center(child: Text("\n\nNo posts available."));
         }
 
         final posts = snapshot.data!.docs;
 
         return ListView.builder(
           shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           itemCount: posts.length,
           itemBuilder: (context, index) {
             final post = posts[index].data() as Map<String, dynamic>;
@@ -236,472 +249,8 @@ class FetchGroupPosts extends StatelessWidget {
   }
 }
 
-class PostWidget extends StatefulWidget {
-  final Map<String, dynamic> post;
-  final String groupId;
-  final String postId;
-
-  const PostWidget({
-    Key? key,
-    required this.post,
-    required this.groupId,
-    required this.postId,
-  }) : super(key: key);
-
-  @override
-  _PostWidgetState createState() => _PostWidgetState();
-}
-
-class _PostWidgetState extends State<PostWidget> {
-  bool isLiked = false;
-  int likeCount = 0;
-  String? userImageUrl;
-  String? userName;
-  @override
-  void initState() {
-    super.initState();
-    final currentUser = FirebaseAuth.instance.currentUser;
-    isLiked = widget.post['likes']?.contains(currentUser?.uid) ?? false;
-    likeCount = widget.post['likeCount'] ?? 0;
-    _fetchUserInfo();
-  }
-  // Fetch user data from Firestore
-  Future<void> _fetchUserInfo() async {
-    String userId = widget.post['createdBy']; // Assuming createdBy stores user ID
-    log(userId.toString(),name: "test");
-    try {
-      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get();
-
-      if (userSnapshot.exists) {
-        log('userSnapshot.exists');
-        setState(() {
-          userImageUrl = userSnapshot['imageUrl'];
-          userName = userSnapshot['name'];
-          log(userName.toString(),name: "test");
-          log(userImageUrl.toString(),name:"test");
-        });
-      }
-    } catch (e) {
-      log(e.toString(),name: "test");
-      log('Error fetching user data: $e');
-    }
-  }
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
-      ),
-      margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildUserInfo(),
-            SizedBox(height: 12.0),
-            _buildPostTitle(),
-            SizedBox(height: 8.0),
-            _buildPostDescription(),
-            if (widget.post['imageUrl'] != null) _buildPostImage(),
-            _buildActionButtons(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Row _buildUserInfo() {
-    return Row(
-      children: [
-        CircleAvatar(
-          backgroundImage: NetworkImage(userImageUrl ?? ''),
-          radius: 24,
-        ),
-        SizedBox(width: 8.0),
-        Text(
-          userName ?? '-----',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        ),
-      ],
-    );
-  }
-
-  Text _buildPostTitle() {
-    return Text(
-      widget.post['title'],
-      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-    );
-  }
-
-  Text _buildPostDescription() {
-    return Text(
-      widget.post['description'],
-      style: TextStyle(fontSize: 14, color: Colors.black87),
-    );
-  }
-
-  ClipRRect _buildPostImage() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16.0),
-      child: Image.network(
-        widget.post['imageUrl'],
-        fit: BoxFit.cover,
-        width: double.infinity,
-      ),
-    );
-  }
-
-  Row _buildActionButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            IconButton(
-              icon: Icon(
-                isLiked ? Icons.favorite : Icons.favorite_border,
-                color: isLiked ? Colors.red : Colors.grey,
-              ),
-              onPressed: () => _toggleLike(),
-            ),
-            Text(likeCount.toString()),
-            SizedBox(width: 16.0),
-            IconButton(
-              icon: Icon(Icons.comment),
-              onPressed: () {
-                _showComments(context);
-              },
-            ),
-            Text(widget.post['commentCount']?.toString() ?? '0'),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Future<void> _toggleLike() async {
-    final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser == null) return;
-
-    final postRef = FirebaseFirestore.instance
-        .collection('groups')
-        .doc(widget.groupId)
-        .collection('posts')
-        .doc(widget.postId);
-    final postSnapshot = await postRef.get();
-
-    if (!postSnapshot.exists) return;
-
-    List<dynamic> likes = postSnapshot['likes'] ?? [];
-    int currentLikeCount = postSnapshot['likeCount'] ?? 0;
-
-    if (isLiked) {
-      // User is unliking the post
-      likes.remove(currentUser.uid);
-      likeCount = currentLikeCount - 1;
-    } else {
-      // User is liking the post
-      likes.add(currentUser.uid);
-      likeCount = currentLikeCount + 1;
-    }
-
-    await postRef.update({
-      'likes': likes,
-      'likeCount': likeCount,
-    });
-
-    setState(() {
-      isLiked = !isLiked;
-    });
-  }
-
-  void _showComments(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return CommentsBottomSheet(postId: widget.postId, groupId: widget.groupId);
-      },
-    );
-  }
-}
 
 
 
-
-class CommentsBottomSheet extends StatefulWidget {
-  final String postId;
-  final String groupId;
-
-  CommentsBottomSheet({required this.postId, required this.groupId});
-
-  @override
-  _CommentsBottomSheetState createState() => _CommentsBottomSheetState();
-}
-
-class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
-  final TextEditingController _commentController = TextEditingController();
-  final String currentUserId = FirebaseAuth.instance.currentUser?.uid ?? "";
-
-  Future<void> _addComment() async {
-    if (_commentController.text.isNotEmpty) {
-      final commentData = {
-        'content': _commentController.text,
-        'createdAt': Timestamp.now(),
-        'createdBy': currentUserId,
-      };
-
-      // Add comment to Firestore
-      await FirebaseFirestore.instance
-          .collection('groups')
-          .doc(widget.groupId)
-          .collection('posts')
-          .doc(widget.postId)
-          .collection('comments')
-          .add(commentData);
-
-      // Update comment count in the post
-      await FirebaseFirestore.instance
-          .collection('groups')
-          .doc(widget.groupId)
-          .collection('posts')
-          .doc(widget.postId)
-          .update({
-        'commentCount': FieldValue.increment(1),
-      });
-
-      // Clear the input field
-      _commentController.clear();
-    }
-  }
-
-  Future<void> _deleteComment(String commentId) async {
-    // Delete comment from Firestore
-    await FirebaseFirestore.instance
-        .collection('groups')
-        .doc(widget.groupId)
-        .collection('posts')
-        .doc(widget.postId)
-        .collection('comments')
-        .doc(commentId)
-        .delete();
-
-    // Update comment count in the post
-    await FirebaseFirestore.instance
-        .collection('groups')
-        .doc(widget.groupId)
-        .collection('posts')
-        .doc(widget.postId)
-        .update({
-      'commentCount': FieldValue.increment(-1),
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(16.0),
-      height: MediaQuery.of(context).size.height * 0.6, // Set height for the bottom sheet
-      child: Column(
-        children: [
-          Text(
-            "Comments",
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('groups')
-                  .doc(widget.groupId)
-                  .collection('posts')
-                  .doc(widget.postId)
-                  .collection('comments')
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text("Error: ${snapshot.error}"));
-                } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return Center(child: Text("No comments available."));
-                }
-
-                final comments = snapshot.data!.docs;
-
-                return ListView.builder(
-                  itemCount: comments.length,
-                  itemBuilder: (context, index) {
-                    final comment = comments[index].data() as Map<String, dynamic>;
-                    final commentId = comments[index].id;
-
-                    return CommentTile(comment: comment,commentId: commentId,currentUserId:comment['createdBy'] ,);
-                    return
-                      ListTile(
-                     subtitle: Text(comment['content']),
-                      title:comment['createdBy'],
-                      trailing: comment['createdBy'] == currentUserId // Check if the current user is the author
-                          ? IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
-                        onPressed: () {
-                          _deleteComment(commentId);
-                        },
-                      )
-                          : null,
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _commentController,
-                    decoration: InputDecoration(
-                      labelText: 'Add a comment',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: _addComment,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-  String? userImageUrl;
-  String? userName;
-
-   Row _buildUserInfo(String userId) {
-
-    return Row(
-      children: [
-        CircleAvatar(
-          backgroundImage: NetworkImage(userImageUrl ?? ''),
-          radius: 24,
-        ),
-        SizedBox(width: 8.0),
-        Text(
-          userName ?? '-----',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        ),
-      ],
-    );
-  }
-  Future<void> _fetchUserInfo(String userId) async {
-
-    log(userId.toString(),name: "test");
-    try {
-      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get();
-
-      if (userSnapshot.exists) {
-        log('userSnapshot.exists');
-
-          userImageUrl = userSnapshot['imageUrl'];
-          userName = userSnapshot['name'];
-          log(userName.toString(),name: "test");
-          log(userImageUrl.toString(),name:"test");
-      }
-    } catch (e) {
-      log(e.toString(),name: "test");
-      log('Error fetching user data: $e');
-    }
-  }
-}
-
-class CommentTile extends StatefulWidget {
-  final Map<String, dynamic> comment;
-  final String currentUserId;
-  final String commentId;
-
-  const CommentTile({
-    Key? key,
-    required this.comment,
-    required this.currentUserId,
-    required this.commentId,
-  }) : super(key: key);
-
-  @override
-  _CommentTileState createState() => _CommentTileState();
-}
-
-class _CommentTileState extends State<CommentTile> {
-  String? userImageUrl;
-  String? userName;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchUserInfo();
-  }
-
-  // Fetch user data from Firestore
-  Future<void> _fetchUserInfo() async {
-    String userId = widget.comment['createdBy']; // Assuming createdBy stores user ID
-    try {
-      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get();
-
-      if (userSnapshot.exists) {
-        setState(() {
-          userImageUrl = userSnapshot['imageUrl'];
-          userName = userSnapshot['name'];
-        });
-      }
-    } catch (e) {
-      print('Error fetching user data: $e');
-    }
-  }
-
-  // Delete comment function
-  Future<void> _deleteComment(String commentId) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('comments')
-          .doc(commentId)
-          .delete();
-    } catch (e) {
-      print('Error deleting comment: $e');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: CircleAvatar(
-        backgroundImage: NetworkImage(userImageUrl ?? ''),
-      ),
-      title: Text(
-        userName ?? '----- ',
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
-      subtitle: Text(widget.comment['content']),
-      trailing: widget.comment['createdBy'] == widget.currentUserId
-          ? IconButton(
-        icon: Icon(Icons.delete, color: Colors.red),
-        onPressed: () {
-          _deleteComment(widget.commentId);
-        },
-      )
-          : null,
-    );
-  }
-}
 
 

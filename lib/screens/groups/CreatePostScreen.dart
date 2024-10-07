@@ -134,7 +134,12 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   Future<void> _createPost() async {
     if (_formKey.currentState!.validate()) {
       // Create a new post in Firestore
-      await FirebaseFirestore.instance.collection('groups').doc(widget.groupId).collection('posts').add({
+      String postId = FirebaseFirestore.instance.collection('groups').doc(widget.groupId).collection('posts').doc().id;
+
+      // Create a new post in Firestore
+      await FirebaseFirestore.instance.collection('groups').doc(widget.groupId).collection('posts').doc(postId).set({
+        'postId': postId, // Add postId field
+        'groupId': widget.groupId, // Add groupId field
         'title': _titleController.text,
         'description': _descriptionController.text,
         'imageUrl': _postImageUrl,
@@ -142,10 +147,9 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         'createdDate': Timestamp.now(),
         'createdBy': _isAnonymous ? 'Anonymous' : FirebaseAuth.instance.currentUser!.uid, // Replace with actual user ID
         'likes': [],
-        'likeCount':0,// Initialize with an empty list for user IDs who liked the post
+        'likeCount': 0, // Initialize with 0 for like count
         'comments': [], // Initialize with an empty list for comments
       });
-
       // Clear the text fields
       _titleController.clear();
       _descriptionController.clear();

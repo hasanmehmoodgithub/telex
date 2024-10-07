@@ -37,15 +37,15 @@ class HomeScreenState extends State<HomeScreen> {
         userName = userData['name'] ?? 'Guest'; // Fetch user name
         profileImageUrl = userData['imageUrl'] ?? 'https://via.placeholder.com/150'; // Fetch user profile image URL
       });
-      // bool approvedStatus = userData['approved'] ?? false; // Fetch user name
-      // if(!approvedStatus){
-      //   showDialog(
-      //     context: context,
-      //     builder: (BuildContext context) {
-      //       return ApprovalDialog();
-      //     },
-      //   );
-      // }
+      bool approvedStatus = userData['approved'] ?? false; // Fetch user name
+      if(!approvedStatus){
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return ApprovalDialog();
+          },
+        );
+      }
     }
   }
 
