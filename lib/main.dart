@@ -4,6 +4,7 @@ import 'package:telex/screens/auth/sign_up_page.dart';
 import 'package:telex/screens/chat/chat_list_screen.dart';
 
 import 'package:telex/screens/events/event_screen.dart';
+import 'package:telex/screens/groups/Group_Feed_Screen.dart';
 import 'package:telex/screens/market/add_market_place_ad_screen.dart';
 import 'package:telex/screens/market/market_place_screen.dart';
 
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
         '/sigIn': (context) => SignInScreen(),
         '/signup': (context) => SignupScreen(),
         '/home': (context) => HomeScreen(),
-        '/groups': (context) => GroupScreen(),
+        '/groups': (context) => GroupFeedScreen(),
         '/groupPosts': (context) => GroupPostScreen(groupId: ModalRoute.of(context)!.settings.arguments as String),
         '/marketplace': (context) => MarketplaceScreen(),
         '/addGroupPost': (context) => AddGroupPostScreen(groupId: ModalRoute.of(context)!.settings.arguments as String),
