@@ -255,15 +255,40 @@ class PostWidget extends StatefulWidget {
 class _PostWidgetState extends State<PostWidget> {
   bool isLiked = false;
   int likeCount = 0;
-
+  String? userImageUrl;
+  String? userName;
   @override
   void initState() {
     super.initState();
     final currentUser = FirebaseAuth.instance.currentUser;
     isLiked = widget.post['likes']?.contains(currentUser?.uid) ?? false;
     likeCount = widget.post['likeCount'] ?? 0;
+    _fetchUserInfo();
   }
+  // Fetch user data from Firestore
+  Future<void> _fetchUserInfo() async {
+    String userId = widget.post['createdBy']; // Assuming createdBy stores user ID
+    log(userId.toString(),name: "test");
+    try {
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
 
+      if (userSnapshot.exists) {
+        log('userSnapshot.exists');
+        setState(() {
+          userImageUrl = userSnapshot['imageUrl'];
+          userName = userSnapshot['name'];
+          log(userName.toString(),name: "test");
+          log(userImageUrl.toString(),name:"test");
+        });
+      }
+    } catch (e) {
+      log(e.toString(),name: "test");
+      log('Error fetching user data: $e');
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -293,12 +318,12 @@ class _PostWidgetState extends State<PostWidget> {
     return Row(
       children: [
         CircleAvatar(
-          backgroundImage: NetworkImage(widget.post['userImage'] ?? ''),
+          backgroundImage: NetworkImage(userImageUrl ?? ''),
           radius: 24,
         ),
         SizedBox(width: 8.0),
         Text(
-          widget.post['createdBy'],
+          userName ?? '-----',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ],
@@ -512,9 +537,11 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                     final comment = comments[index].data() as Map<String, dynamic>;
                     final commentId = comments[index].id;
 
-                    return ListTile(
-                      title: Text(comment['content']),
-                      subtitle: Text(comment['createdBy'] ?? 'Unknown user'),
+                    return CommentTile(comment: comment,commentId: commentId,currentUserId:comment['createdBy'] ,);
+                    return
+                      ListTile(
+                     subtitle: Text(comment['content']),
+                      title:comment['createdBy'],
                       trailing: comment['createdBy'] == currentUserId // Check if the current user is the author
                           ? IconButton(
                         icon: Icon(Icons.delete, color: Colors.red),
@@ -553,5 +580,128 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       ),
     );
   }
+  String? userImageUrl;
+  String? userName;
+
+   Row _buildUserInfo(String userId) {
+
+    return Row(
+      children: [
+        CircleAvatar(
+          backgroundImage: NetworkImage(userImageUrl ?? ''),
+          radius: 24,
+        ),
+        SizedBox(width: 8.0),
+        Text(
+          userName ?? '-----',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+      ],
+    );
+  }
+  Future<void> _fetchUserInfo(String userId) async {
+
+    log(userId.toString(),name: "test");
+    try {
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      if (userSnapshot.exists) {
+        log('userSnapshot.exists');
+
+          userImageUrl = userSnapshot['imageUrl'];
+          userName = userSnapshot['name'];
+          log(userName.toString(),name: "test");
+          log(userImageUrl.toString(),name:"test");
+      }
+    } catch (e) {
+      log(e.toString(),name: "test");
+      log('Error fetching user data: $e');
+    }
+  }
 }
+
+class CommentTile extends StatefulWidget {
+  final Map<String, dynamic> comment;
+  final String currentUserId;
+  final String commentId;
+
+  const CommentTile({
+    Key? key,
+    required this.comment,
+    required this.currentUserId,
+    required this.commentId,
+  }) : super(key: key);
+
+  @override
+  _CommentTileState createState() => _CommentTileState();
+}
+
+class _CommentTileState extends State<CommentTile> {
+  String? userImageUrl;
+  String? userName;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserInfo();
+  }
+
+  // Fetch user data from Firestore
+  Future<void> _fetchUserInfo() async {
+    String userId = widget.comment['createdBy']; // Assuming createdBy stores user ID
+    try {
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      if (userSnapshot.exists) {
+        setState(() {
+          userImageUrl = userSnapshot['imageUrl'];
+          userName = userSnapshot['name'];
+        });
+      }
+    } catch (e) {
+      print('Error fetching user data: $e');
+    }
+  }
+
+  // Delete comment function
+  Future<void> _deleteComment(String commentId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('comments')
+          .doc(commentId)
+          .delete();
+    } catch (e) {
+      print('Error deleting comment: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundImage: NetworkImage(userImageUrl ?? ''),
+      ),
+      title: Text(
+        userName ?? '----- ',
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      subtitle: Text(widget.comment['content']),
+      trailing: widget.comment['createdBy'] == widget.currentUserId
+          ? IconButton(
+        icon: Icon(Icons.delete, color: Colors.red),
+        onPressed: () {
+          _deleteComment(widget.commentId);
+        },
+      )
+          : null,
+    );
+  }
+}
+
 

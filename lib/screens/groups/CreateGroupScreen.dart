@@ -160,6 +160,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
 
       // Optionally navigate back to the previous screen
       Navigator.pop(context);
+      Navigator.pop(context);
+      Navigator.pushNamed(context, "/groups");
+
     }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -139,7 +140,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         'imageUrl': _postImageUrl,
         'isAnonymous': _isAnonymous,
         'createdDate': Timestamp.now(),
-        'createdBy': _isAnonymous ? 'Anonymous' : 'User ID here', // Replace with actual user ID
+        'createdBy': _isAnonymous ? 'Anonymous' : FirebaseAuth.instance.currentUser!.uid, // Replace with actual user ID
         'likes': [],
         'likeCount':0,// Initialize with an empty list for user IDs who liked the post
         'comments': [], // Initialize with an empty list for comments
