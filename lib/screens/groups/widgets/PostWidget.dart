@@ -1,10 +1,12 @@
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:telex/screens/groups/widgets/CommentsBottomSheet.dart';
 import 'package:telex/screens/home/user_profile_screen.dart';
+import 'package:telex/utils/app_funtions.dart';
 
 class PostWidget extends StatefulWidget {
   final Map<String, dynamic> post;
@@ -101,10 +103,15 @@ class _PostWidgetState extends State<PostWidget> {
             radius: 24,
           ),
           SizedBox(width: 8.0),
-          Text(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [   Text(
             userName ?? '-----',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
+            Text(   getTimeAgo( widget.post["createdDate"]), style: TextStyle(fontSize: 12,color: Colors.grey)),],)
+
         ],
       ),
     );
@@ -127,10 +134,23 @@ class _PostWidgetState extends State<PostWidget> {
   ClipRRect _buildPostImage() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16.0),
-      child: Image.network(
-        widget.post['imageUrl'],
+      child: CachedNetworkImage(
+        imageUrl: widget.post['imageUrl'],
         fit: BoxFit.cover,
         width: double.infinity,
+        placeholder: (context, url) => Container(
+          color: Colors.grey[300], // Grey placeholder
+          height: 150.0, // Adjust height if needed
+          child: Center(child: CircularProgressIndicator()), // Optional loading spinner
+        ),
+        errorWidget: (context, url, error) => Container(
+          color: Colors.grey[300], // Grey background for error
+          height: 150.0, // Adjust height if needed
+          child: Icon(
+            Icons.error, // Error icon
+            color: Colors.red,
+          ),
+        ),
       ),
     );
   }

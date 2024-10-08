@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -46,7 +47,7 @@ class _AllGroupsScreenState extends State<AllGroupsScreen> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 280,
+          height: 230,
       child: FutureBuilder<List<Map<String, dynamic>>>(
         future: _allGroupsFuture,
         builder: (context, snapshot) {
@@ -128,8 +129,8 @@ class _AllGroupsScreenState extends State<AllGroupsScreen> {
         );
       },
       child: Container(
-        height: 250,
-        width: 200,
+        height: 225,
+        width: 160,
         child: Card(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -137,7 +138,15 @@ class _AllGroupsScreenState extends State<AllGroupsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Image.network(group["groupUrl"], height: 150),
+            CachedNetworkImage(
+            imageUrl: group["groupUrl"],
+              fit: BoxFit.cover,
+              width: double.infinity,
+              placeholder: (context, url) => Container(
+                color: Colors.grey[300], // Grey placeholder
+                height: 100.0, // Adjust height if needed
+                child: Center(child: CircularProgressIndicator()), // Loading spinner
+              )),
                 Text(
                   group['name'],
                   style: const TextStyle(fontSize: 18),
@@ -150,11 +159,15 @@ class _AllGroupsScreenState extends State<AllGroupsScreen> {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    joinGroup(group['id']);
-                  },
-                  child: const Text("Join"),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: ElevatedButton(
+
+                    onPressed: () {
+                      joinGroup(group['id']);
+                    },
+                    child: const Text("Join"),
+                  ),
                 ),
               ],
             ),

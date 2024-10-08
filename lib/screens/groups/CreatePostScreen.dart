@@ -18,6 +18,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
+  File? _localImageFile; // To hold the locally selected image file
   String? _postImageUrl;
   bool _isAnonymous = false; // For anonymous posts
 
@@ -27,7 +28,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Create Post"),
+        title: const Text("Create Post"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -39,7 +40,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               // Post Title
               TextFormField(
                 controller: _titleController,
-                decoration: InputDecoration(labelText: 'Title'),
+                decoration: const InputDecoration(labelText: 'Title'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a title';
@@ -47,12 +48,12 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               // Post Description
               TextFormField(
                 controller: _descriptionController,
-                decoration: InputDecoration(labelText: 'Description'),
+                decoration: const InputDecoration(labelText: 'Description'),
                 maxLines: 3,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -61,18 +62,18 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               // Post Image
-              _postImageUrl != null
-                  ? Image.network(_postImageUrl!, height: 100) // Display selected image
+              _localImageFile != null
+                  ? Image.file(_localImageFile!, height: 100) // Display locally selected image
                   : Container(),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               ElevatedButton(
                 onPressed: _pickImage,
-                child: Text("Pick Post Image (optional)"),
+                child: const Text("Pick Post Image (optional)"),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               // Anonymous Post Toggle
               Row(
@@ -85,14 +86,14 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       });
                     },
                   ),
-                  Text("Post Anonymously"),
+                  const Text("Post Anonymously"),
                 ],
               ),
 
               // Create Post Button
               ElevatedButton(
                 onPressed: _createPost,
-                child: Text("Create Post"),
+                child: const Text("Create Post"),
               ),
             ],
           ),
@@ -104,15 +105,13 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      // Upload to Firebase Storage and get URL
-      final url = await _uploadImageToFirebase(pickedFile.path);
       setState(() {
-        _postImageUrl = url;
+        _localImageFile = File(pickedFile.path); // Display the image locally before uploading
       });
     }
   }
 
-  Future<String?> _uploadImageToFirebase(String filePath) async {
+  Future<void> _uploadImageToFirebase(String filePath) async {
     try {
       // Create a unique file name
       String fileName = DateTime.now().millisecondsSinceEpoch.toString();
@@ -124,45 +123,76 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
       // Get the download URL
       String downloadUrl = await ref.getDownloadURL();
-      return downloadUrl;
+      setState(() {
+        _postImageUrl = downloadUrl; // Set the URL after upload
+      });
     } catch (e) {
       print("Error uploading image: $e");
-      return null;
     }
   }
 
   Future<void> _createPost() async {
     if (_formKey.currentState!.validate()) {
-      // Create a new post in Firestore
-      String postId = FirebaseFirestore.instance.collection('groups').doc(widget.groupId).collection('posts').doc().id;
+      // Show a loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return const Center(child: CircularProgressIndicator());
+        },
+      );
+
+      // If an image is selected, upload it first
+      if (_localImageFile != null) {
+        await _uploadImageToFirebase(_localImageFile!.path);
+      }
 
       // Create a new post in Firestore
-      await FirebaseFirestore.instance.collection('groups').doc(widget.groupId).collection('posts').doc(postId).set({
+      String postId = FirebaseFirestore.instance
+          .collection('groups')
+          .doc(widget.groupId)
+          .collection('posts')
+          .doc()
+          .id;
+
+      await FirebaseFirestore.instance
+          .collection('groups')
+          .doc(widget.groupId)
+          .collection('posts')
+          .doc(postId)
+          .set({
         'postId': postId, // Add postId field
         'groupId': widget.groupId, // Add groupId field
         'title': _titleController.text,
         'description': _descriptionController.text,
-        'imageUrl': _postImageUrl,
+        'imageUrl': _postImageUrl, // Add the uploaded image URL
         'isAnonymous': _isAnonymous,
         'createdDate': Timestamp.now(),
-        'createdBy': _isAnonymous ? 'Anonymous' : FirebaseAuth.instance.currentUser!.uid, // Replace with actual user ID
+        'createdBy': _isAnonymous
+            ? 'Anonymous'
+            : FirebaseAuth.instance.currentUser!.uid, // Replace with actual user ID
         'likes': [],
         'likeCount': 0, // Initialize with 0 for like count
         'comments': [], // Initialize with an empty list for comments
       });
+
+      // Close the loading dialog
+      Navigator.pop(context);
+
       // Clear the text fields
       _titleController.clear();
       _descriptionController.clear();
       setState(() {
-        _postImageUrl = null; // Clear the post URL
+        _localImageFile = null; // Clear the local image file
+        _postImageUrl = null; // Clear the post image URL
       });
 
       // Show a success message
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Post created successfully!")));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Post created successfully!")));
 
       // Optionally navigate back to the previous screen
       Navigator.pop(context);
-
     }
   }
 }

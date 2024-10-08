@@ -94,7 +94,7 @@ class _JoinedGroupPostsState extends State<JoinedGroupPosts> {
         : _posts.isEmpty
         ? Center(child: Text('No posts available'))
         : ListView.builder(
-      physics: NeverScrollableScrollPhysics(),
+   //   physics: NeverScrollableScrollPhysics(),
       itemCount: _posts.length,
       itemBuilder: (context, index) {
         final post = _posts[index];

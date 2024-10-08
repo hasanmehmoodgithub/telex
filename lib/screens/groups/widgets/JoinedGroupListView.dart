@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -36,8 +37,8 @@ class _JoinedGroupListViewState extends State<JoinedGroupListView> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 260,
+    return SizedBox(
+      height: 180,
       child: FutureBuilder<List<Map<String, dynamic>>>(
         future: _joinedGroupsFuture,
         builder: (context, snapshot) {
@@ -51,6 +52,7 @@ class _JoinedGroupListViewState extends State<JoinedGroupListView> {
 
           final joinedGroups = snapshot.data!;
           return ListView.builder(
+
             scrollDirection: Axis.horizontal,
             itemCount: joinedGroups.length,
             itemBuilder: (context, index) {
@@ -111,10 +113,10 @@ class _JoinedGroupListViewState extends State<JoinedGroupListView> {
     );
   }
 
-  Container groupItemCard(Map<String, dynamic> group) {
-    return Container(
-      height: 250,
-      width: 200,
+  SizedBox groupItemCard(Map<String, dynamic> group) {
+    return SizedBox(
+      height: 160,
+      width: 160,
       child: Card(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -122,7 +124,15 @@ class _JoinedGroupListViewState extends State<JoinedGroupListView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Image.network(group["groupUrl"], height: 150),
+              CachedNetworkImage(
+                fit: BoxFit.cover,
+                imageUrl: group["groupUrl"] ??
+                    "https://media.istockphoto.com/id/1223631367/vector/multicultural-group-of-people-is-standing-together-team-of-colleagues-students-happy-men-and.jpg?s=612x612&w=0&k=20&c=9Mwxpq9gADCuEyvFxUdmNhlQea5PED-jwCmqtfgdXhU=",
+                height: 100,
+                width: 200,
+                placeholder: (context, url) => Center(child: CircularProgressIndicator()), // Shows a loader while the image is loading
+                errorWidget: (context, url, error) => Icon(Icons.error), // Shows error icon if image fails to load
+              ),
               Text(
                 group['name'],
                 style: const TextStyle(fontSize: 18),

@@ -41,7 +41,7 @@ class GroupFeedScreenState extends State<GroupFeedScreen> {
               SizedBox(height: 10),
               // Wrapping the posts list in SizedBox to give a fixed height
               SizedBox(
-                height: MediaQuery.of(context).size.height * 0.5, // Adjust this height as needed
+                height: MediaQuery.of(context).size.height * 0.5,
                 child: JoinedGroupPosts(),
               ),
             ],

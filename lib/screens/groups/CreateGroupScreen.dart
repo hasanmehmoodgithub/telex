@@ -16,6 +16,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   final _groupDescriptionController = TextEditingController();
   bool _isPrivate = false;
   String? _groupImageUrl;
+  bool _isLoading = false; // To track loading state
 
   final ImagePicker _picker = ImagePicker();
 
@@ -24,18 +25,21 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Create Group"),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: ListView(
             children: [
               // Group Name
               TextFormField(
                 controller: _groupNameController,
-                decoration: InputDecoration(labelText: 'Group Name'),
+                decoration: InputDecoration(
+                  labelText: 'Group Name',
+                  border: OutlineInputBorder(),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a group name';
@@ -43,12 +47,15 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               // Group Description
               TextFormField(
                 controller: _groupDescriptionController,
-                decoration: InputDecoration(labelText: 'Group Description'),
+                decoration: InputDecoration(
+                  labelText: 'Group Description',
+                  border: OutlineInputBorder(),
+                ),
                 maxLines: 3,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -57,21 +64,21 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               // Group Image
-              _groupImageUrl != null
-                  ? Image.network(_groupImageUrl!, height: 100) // Display selected image
-                  : Container(),
-              SizedBox(height: 8),
+              if (_groupImageUrl != null)
+                Image.file(File(_groupImageUrl!), height: 100, fit: BoxFit.cover),
+              const SizedBox(height: 8),
               ElevatedButton(
                 onPressed: _pickImage,
                 child: Text("Pick Group Image (optional)"),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               // Private Group Toggle
               Row(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Checkbox(
                     value: _isPrivate,
@@ -87,8 +94,14 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
 
               // Create Group Button
               ElevatedButton(
-                onPressed: _createGroup,
-                child: Text("Create Group"),
+                onPressed: _isLoading ? null : _createGroup, // Disable button when loading
+                child: _isLoading
+                    ? CircularProgressIndicator(color: Colors.white) // Show loading indicator
+                    : Text("Create Group"),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  textStyle: const TextStyle(fontSize: 16),
+                ),
               ),
             ],
           ),
@@ -100,16 +113,19 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      // Upload to Firebase Storage and get URL
-      final url = await _uploadImageToFirebase(pickedFile.path);
       setState(() {
-        _groupImageUrl = url;
+        _groupImageUrl = pickedFile.path; // Set local file path to display image
       });
     }
   }
 
   Future<String?> _uploadImageToFirebase(String filePath) async {
     try {
+      // Show loading dialog
+      setState(() {
+        _isLoading = true;
+      });
+
       // Create a unique file name
       String fileName = DateTime.now().millisecondsSinceEpoch.toString();
       // Create a reference to the storage location
@@ -124,6 +140,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     } catch (e) {
       print("Error uploading image: $e");
       return null;
+    } finally {
+      setState(() {
+        _isLoading = false; // Hide loading dialog
+      });
     }
   }
 
@@ -135,10 +155,13 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
 
       // Use a default image URL if none was selected
       String defaultImageUrl = 'https://media.istockphoto.com/id/1223631367/vector/multicultural-group-of-people-is-standing-together-team-of-colleagues-students-happy-men-and.jpg?s=612x612&w=0&k=20&c=9Mwxpq9gADCuEyvFxUdmNhlQea5PED-jwCmqtfgdXhU=';
-      String groupImageUrl = _groupImageUrl ?? defaultImageUrl;
+      String? groupImageUrl = _groupImageUrl != null ? await _uploadImageToFirebase(_groupImageUrl!) : defaultImageUrl;
+
+      // Generate a unique group ID
+      String groupId = DateTime.now().millisecondsSinceEpoch.toString();
 
       // Create a new group in Firestore
-      await FirebaseFirestore.instance.collection('groups').add({
+      await FirebaseFirestore.instance.collection('groups').doc(groupId).set({
         'name': _groupNameController.text,
         'description': _groupDescriptionController.text,
         'isPrivate': _isPrivate,
@@ -160,9 +183,6 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
 
       // Optionally navigate back to the previous screen
       Navigator.pop(context);
-      Navigator.pop(context);
-      Navigator.pushNamed(context, "/groups");
-
     }
   }
 }
