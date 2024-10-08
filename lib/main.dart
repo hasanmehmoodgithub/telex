@@ -1,11 +1,14 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:telex/AboutScreen.dart';
 import 'package:telex/screens/auth/sign_up_page.dart';
 import 'package:telex/screens/chat/chat_list_screen.dart';
 
 import 'package:telex/screens/events/event_screen.dart';
-import 'package:telex/screens/games/FlapyBird.dart';
-import 'package:telex/screens/games/SnakeGame.dart';
+import 'package:telex/screens/games/FourInARowApp.dart';
+import 'package:telex/screens/games/RockPaperScissors.dart';
+
+import 'package:telex/screens/games/games_list_screen.dart';
 import 'package:telex/screens/games/tic_tac_game.dart';
 import 'package:telex/screens/groups/Group_Feed_Screen.dart';
 import 'package:telex/screens/market/add_market_place_ad_screen.dart';
@@ -52,8 +55,13 @@ class MyApp extends StatelessWidget {
         '/chatsList': (context) => ChatListScreen(),
         '/singleChat': (context) => SingleChatScreen(chatId: ModalRoute.of(context)!.settings.arguments as String),
         "/events": (context) =>EventScreen(),
+        "/games": (context) =>GamesListScreen(),
         "/tictac": (context) =>TicTacToeGame(),
-        "/snake": (context) =>RockPaperScissors()
+        "/rockpaper": (context) =>RockPaperScissors(),
+        "/about": (context) =>AboutScreen(),
+        "/FourInARowApp": (context) =>FourInARowApp(),
+
+
 
       },
     );
