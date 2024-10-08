@@ -4,6 +4,9 @@ import 'package:telex/screens/auth/sign_up_page.dart';
 import 'package:telex/screens/chat/chat_list_screen.dart';
 
 import 'package:telex/screens/events/event_screen.dart';
+import 'package:telex/screens/games/FlapyBird.dart';
+import 'package:telex/screens/games/SnakeGame.dart';
+import 'package:telex/screens/games/tic_tac_game.dart';
 import 'package:telex/screens/groups/Group_Feed_Screen.dart';
 import 'package:telex/screens/market/add_market_place_ad_screen.dart';
 import 'package:telex/screens/market/market_place_screen.dart';
@@ -48,7 +51,10 @@ class MyApp extends StatelessWidget {
         '/addMarketplaceAd': (context) => AddMarketplaceAdScreen(),
         '/chatsList': (context) => ChatListScreen(),
         '/singleChat': (context) => SingleChatScreen(chatId: ModalRoute.of(context)!.settings.arguments as String),
-        "/events": (context) =>EventScreen()
+        "/events": (context) =>EventScreen(),
+        "/tictac": (context) =>TicTacToeGame(),
+        "/snake": (context) =>RockPaperScissors()
+
       },
     );
   }

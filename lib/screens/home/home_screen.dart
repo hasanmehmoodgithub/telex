@@ -161,7 +161,7 @@ class HomeScreenState extends State<HomeScreen> {
                         Icons.games,
                          Colors.blueAccent,
                             () {
-                          Navigator.pushNamed(context, '/games');
+                          Navigator.pushNamed(context, '/tictac');
                         },
                       ),
                       _buildCard(
@@ -170,7 +170,7 @@ class HomeScreenState extends State<HomeScreen> {
                         Icons.app_blocking_outlined,
                         Colors.deepPurple,
                             () {
-                          Navigator.pushNamed(context, '/about');
+                          Navigator.pushNamed(context, '/snake');
                         },
                       ),
                     ],
