@@ -52,27 +52,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
     }
   }
 
-  Future<void> _deleteComment(String commentId) async {
-    // Delete comment from Firestore
-    await FirebaseFirestore.instance
-        .collection('groups')
-        .doc(widget.groupId)
-        .collection('posts')
-        .doc(widget.postId)
-        .collection('comments')
-        .doc(commentId)
-        .delete();
 
-    // Update comment count in the post
-    await FirebaseFirestore.instance
-        .collection('groups')
-        .doc(widget.groupId)
-        .collection('posts')
-        .doc(widget.postId)
-        .update({
-      'commentCount': FieldValue.increment(-1),
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,20 +91,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                     final comment = comments[index].data() as Map<String, dynamic>;
                     final commentId = comments[index].id;
 
-                    return CommentTile(comment: comment,commentId: commentId,currentUserId:comment['createdBy'] ,);
-                    return
-                      ListTile(
-                        subtitle: Text(comment['content']),
-                        title:comment['createdBy'],
-                        trailing: comment['createdBy'] == currentUserId // Check if the current user is the author
-                            ? IconButton(
-                          icon: Icon(Icons.delete, color: Colors.red),
-                          onPressed: () {
-                            _deleteComment(commentId);
-                          },
-                        )
-                            : null,
-                      );
+                    return CommentTile(comment: comment,commentId: commentId,currentUserId:comment['createdBy'] ,onTabDelete: (){_deleteComment(commentId);});
+
                   },
                 );
               },
@@ -156,7 +124,27 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
   }
   String? userImageUrl;
   String? userName;
+  Future<void> _deleteComment(String commentId) async {
+    // Delete comment from Firestore
+    await FirebaseFirestore.instance
+        .collection('groups')
+        .doc(widget.groupId)
+        .collection('posts')
+        .doc(widget.postId)
+        .collection('comments')
+        .doc(commentId)
+        .delete();
 
+    // Update comment count in the post
+    await FirebaseFirestore.instance
+        .collection('groups')
+        .doc(widget.groupId)
+        .collection('posts')
+        .doc(widget.postId)
+        .update({
+      'commentCount': FieldValue.increment(-1),
+    });
+  }
   Row _buildUserInfo(String userId) {
 
     return Row(
@@ -173,26 +161,5 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       ],
     );
   }
-  Future<void> _fetchUserInfo(String userId) async {
 
-    log(userId.toString(),name: "test");
-    try {
-      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get();
-
-      if (userSnapshot.exists) {
-        log('userSnapshot.exists');
-
-        userImageUrl = userSnapshot['imageUrl'];
-        userName = userSnapshot['name'];
-        log(userName.toString(),name: "test");
-        log(userImageUrl.toString(),name:"test");
-      }
-    } catch (e) {
-      log(e.toString(),name: "test");
-      log('Error fetching user data: $e');
-    }
-  }
 }

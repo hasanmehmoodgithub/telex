@@ -138,11 +138,12 @@ class _AllGroupsScreenState extends State<AllGroupsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-            CachedNetworkImage(
-            imageUrl: group["groupUrl"],
+            CachedNetworkImage(height: 100,
+            imageUrl: group["groupUrl"]??"https://media.istockphoto.com/id/1223631367/vector/multicultural-group-of-people-is-standing-together-team-of-colleagues-students-happy-men-and.jpg?s=612x612&w=0&k=20&c=9Mwxpq9gADCuEyvFxUdmNhlQea5PED-jwCmqtfgdXhU=",
               fit: BoxFit.cover,
               width: double.infinity,
               placeholder: (context, url) => Container(
+
                 color: Colors.grey[300], // Grey placeholder
                 height: 100.0, // Adjust height if needed
                 child: Center(child: CircularProgressIndicator()), // Loading spinner

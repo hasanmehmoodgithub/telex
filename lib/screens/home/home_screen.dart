@@ -155,6 +155,24 @@ class HomeScreenState extends State<HomeScreen> {
                           Navigator.pushNamed(context, '/chatsList');
                         },
                       ),
+                      _buildCard(
+                        context,
+                        'Games',
+                        Icons.games,
+                         Colors.blueAccent,
+                            () {
+                          Navigator.pushNamed(context, '/games');
+                        },
+                      ),
+                      _buildCard(
+                        context,
+                        'About',
+                        Icons.app_blocking_outlined,
+                        Colors.deepPurple,
+                            () {
+                          Navigator.pushNamed(context, '/about');
+                        },
+                      ),
                     ],
                   ),
                 ],

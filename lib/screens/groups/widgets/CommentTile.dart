@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class CommentTile extends StatefulWidget {
+  final VoidCallback onTabDelete;
   final Map<String, dynamic> comment;
   final String currentUserId;
   final String commentId;
@@ -12,6 +13,7 @@ class CommentTile extends StatefulWidget {
     required this.comment,
     required this.currentUserId,
     required this.commentId,
+    required this.onTabDelete,
   }) : super(key: key);
 
   @override
@@ -49,16 +51,7 @@ class _CommentTileState extends State<CommentTile> {
   }
 
   // Delete comment function
-  Future<void> _deleteComment(String commentId) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('comments')
-          .doc(commentId)
-          .delete();
-    } catch (e) {
-      print('Error deleting comment: $e');
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -74,9 +67,7 @@ class _CommentTileState extends State<CommentTile> {
       trailing: widget.comment['createdBy'] == widget.currentUserId
           ? IconButton(
         icon: Icon(Icons.delete, color: Colors.red),
-        onPressed: () {
-          _deleteComment(widget.commentId);
-        },
+        onPressed: widget.onTabDelete,
       )
           : null,
     );
