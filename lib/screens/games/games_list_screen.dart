@@ -49,9 +49,11 @@ class GamesListScreen extends StatelessWidget {
     ),
     // Add more games here
   ];
-  Future<void> _launchURL(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
+
+  void _launchURL(String route) async {
+    final Uri url = Uri.parse(route);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
     } else {
       throw 'Could not launch $url';
     }
