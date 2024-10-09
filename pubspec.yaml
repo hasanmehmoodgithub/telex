@@ -46,6 +46,8 @@ dependencies:
   cached_network_image: ^3.4.1
   timeago:
   shimmer:
+  webview_flutter:
+  url_launcher:
 
 dev_dependencies:
   flutter_test:
