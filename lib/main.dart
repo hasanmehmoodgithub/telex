@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter App',
+      title: 'TeleX',
       theme: ThemeData(primarySwatch: Colors.blue),
       initialRoute: '/splash',
       routes: {

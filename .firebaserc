@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "socailx-2e7b4"
-  }
+  },
+  "targets": {
+    "socailx-2e7b4": {
+      "hosting": {
+        "telexnuml": [
+          "telexnuml"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
