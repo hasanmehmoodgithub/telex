@@ -2,14 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:telex/common/custom_form_button.dart';
 import 'package:telex/common/custom_input_field.dart';
-
 import 'package:telex/common/page_header.dart';
 import 'package:telex/common/page_heading.dart';
 import 'package:telex/common/responsive_widget.dart';
 import 'package:telex/screens/auth/sign_up_page.dart';
-
-
-
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({Key? key}) : super(key: key);
@@ -49,9 +45,9 @@ class _SignInScreenState extends State<SignInScreen> {
                           children: [
                             const PageHeading(title: 'Log-in',),
                             CustomInputField(
-                                controller:_emailController,
+                               controller:_emailController,
                               labelText: 'Email',
-                              hintText: 'Your email id',
+                              hintText: 'Enter Your email id',
                               validator: (textValue) {
                                 if (textValue == null || textValue.isEmpty) {
                                   return 'Email is required!';
@@ -65,7 +61,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             CustomInputField(
                               controller:_passwordController,
                               labelText: 'Password',
-                              hintText: 'Your password',
+                              hintText: 'Enter Your password',
                               obscureText: true,
                               suffixIcon: true,
                               validator: (textValue) {
@@ -76,24 +72,8 @@ class _SignInScreenState extends State<SignInScreen> {
                               },
                             ),
                             const SizedBox(height: 16,),
-                            // Container(
-                            //   width: size.width * 0.80,
-                            //   alignment: Alignment.centerRight,
-                            //   child: GestureDetector(
-                            //     onTap: () => {
-                            //       Navigator.push(context, MaterialPageRoute(builder: (context) => const ForgetPasswordPage()))
-                            //     },
-                            //     child: const Text(
-                            //       'Forget password?',
-                            //       style: TextStyle(
-                            //         color: Color(0xff939393),
-                            //         fontSize: 13,
-                            //         fontWeight: FontWeight.bold,
-                            //       ),
-                            //     ),
-                            //   ),
-                            // ),
                             const SizedBox(height: 20,),
+                     
                             _isLoading
                                 ? const CircularProgressIndicator():
                             CustomFormButton(innerText: 'Login', onPressed: _handleLoginUser,),
@@ -106,7 +86,10 @@ class _SignInScreenState extends State<SignInScreen> {
                                   const Text('Don\'t have an account ? ', style: TextStyle(fontSize: 13, color: Color(0xff939393), fontWeight: FontWeight.bold),),
                                   GestureDetector(
                                     onTap: () => {
-                                      Navigator.push(context, MaterialPageRoute(builder: (context) => const SignupScreen()))
+
+                                      Navigator.push(
+                                          context, MaterialPageRoute(builder: (context) => const
+                                      SignupScreen()))
                                     },
                                     child: const Text('Sign-up', style: TextStyle(fontSize: 15, color: Color(0xff748288), fontWeight: FontWeight.bold),),
                                   ),
@@ -130,11 +113,14 @@ class _SignInScreenState extends State<SignInScreen> {
   void _handleLoginUser()async {
     // login user
     if (_loginFormKey.currentState!.validate()) {
-
       setState(() {
         _isLoading = true;
       });
       try {
+
+
+       ///1
+
         UserCredential userCredential = await FirebaseAuth.instance
             .signInWithEmailAndPassword(
             email: _emailController.text.trim(),
@@ -158,6 +144,8 @@ class _SignInScreenState extends State<SignInScreen> {
   // Sign in method
 
 }
+
+
 final RegExp emailRegExp = RegExp(
     r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
 );

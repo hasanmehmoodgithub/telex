@@ -40,6 +40,7 @@ class AboutScreen extends StatelessWidget {
             _buildFeatureItem('• Enjoy offline games with friends.'),
             _buildFeatureItem('• Stay updated with event notifications.'),
             _buildFeatureItem('• Only NUML students can create an account, verified by admin approval.'),
+
             SizedBox(height: 16),
             Text(
               'Verification Process',

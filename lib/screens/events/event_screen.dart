@@ -29,11 +29,14 @@ class _EventScreenState extends State<EventScreen> {
       body:ResponsiveWidget(
         maxWidth: 600.0,
         child: StreamBuilder<List<Event>>(
+          // get data from this stream
           stream: getEvents(),
           builder: (context, snapshot) {
+            //loading
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
             }
+            //empty case
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return Center(child: Text('No events found'));
             }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:telex/common/responsive_widget.dart';
 
 class FourInARowApp extends StatefulWidget {
   @override
@@ -116,37 +117,40 @@ class _FourInARowAppState extends State<FourInARowApp> {
       appBar: AppBar(
         title: Text('Four in a Row'),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: columns, // 7 columns
-                childAspectRatio: 1.0, // Square cells
-              ),
-              itemCount: rows * columns, // 6 rows * 7 columns = 42 cells
-              itemBuilder: (context, index) {
-                int row = index ~/ columns;
-                int col = index % columns;
+      body: ResponsiveWidget(
+        maxWidth: 600,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: columns, // 7 columns
+                  childAspectRatio: 1.0, // Square cells
+                ),
+                itemCount: rows * columns, // 6 rows * 7 columns = 42 cells
+                itemBuilder: (context, index) {
+                  int row = index ~/ columns;
+                  int col = index % columns;
 
-                return GestureDetector(
-                  onTap: () => dropDisc(col), // Drop disc in the tapped column
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.blueAccent),
-                      color: board[row][col] == 0
-                          ? Colors.white
-                          : board[row][col] == 1
-                          ? Colors.red
-                          : Colors.yellow,
+                  return GestureDetector(
+                    onTap: () => dropDisc(col), // Drop disc in the tapped column
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.blueAccent),
+                        color: board[row][col] == 0
+                            ? Colors.white
+                            : board[row][col] == 1
+                            ? Colors.red
+                            : Colors.yellow,
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

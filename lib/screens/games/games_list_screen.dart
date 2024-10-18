@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:telex/common/responsive_widget.dart';
 import 'package:telex/screens/games/GameWebView.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/foundation.dart';
@@ -16,6 +17,7 @@ class GamesListScreen extends StatelessWidget {
       isWeb: true,
 
     ),
+
     GameItem(
       title: 'Slither',
       description: 'A multiplayer snake game where you grow by eating pellets.',
@@ -64,75 +66,79 @@ class GamesListScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Games List'),
       ),
-      body: ListView.builder(
-        itemCount: games.length,
-        itemBuilder: (context, index) {
-          final game = games[index];
-          return InkWell(
-            onTap: (){
-              if(game.isWeb)
-                {
-                  if (kIsWeb){
-                    _launchURL(game.route);
+      body: ResponsiveWidget(
+        maxWidth: 600.0,
+        child: ListView.builder(
+          itemCount: games.length,
+          itemBuilder: (context, index) {
+            final game = games[index];
+            return InkWell(
+              onTap: (){
+
+                if(game.isWeb)
+                  {
+                    if (kIsWeb){
+                      _launchURL(game.route);
+
+                    }
+                    else{
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => GameWebView(url: game.route,title: game.title,))
+                      );
+                    }
 
                   }
-                  else{
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => GameWebView(url: game.route,title: game.title,))
-                    );
-                  }
-
+                else{
+                  Navigator.pushNamed(context, "/${game.route}");
                 }
-              else{
-                Navigator.pushNamed(context, "/${game.route}");
-              }
 
 
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Card(
-                elevation: 4,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Cached network image with height and BoxFit.cover
-                    CachedNetworkImage(
-                      imageUrl: game.imageUrl,
-                      height: 200, // Fixed height for the image
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) =>
-                          Center(child: CircularProgressIndicator()),
-                      errorWidget: (context, url, error) =>
-                          Icon(Icons.error, size: 50),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        game.title,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Card(
+                  elevation: 4,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Cached network image with height and BoxFit.cover
+                      CachedNetworkImage(
+                        imageUrl: game.imageUrl,
+                        height: 200, // Fixed height for the image
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) =>
+                            Center(child: CircularProgressIndicator()),
+                        errorWidget: (context, url, error) =>
+                            Icon(Icons.error, size: 50),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          game.title,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Text(
-                        game.description,
-                        style: TextStyle(fontSize: 16),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text(
+                          game.description,
+                          style: TextStyle(fontSize: 16),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 10),
-                  ],
+                      SizedBox(height: 10),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

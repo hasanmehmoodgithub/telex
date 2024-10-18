@@ -26,6 +26,7 @@ class HomeScreenState extends State<HomeScreen> {
 
   Future<void> _fetchUserData() async {
     User? user = FirebaseAuth.instance.currentUser;
+
     if (user != null) {
       // Fetch user data from FireStore
       DocumentSnapshot userData = await FirebaseFirestore.instance
@@ -37,7 +38,7 @@ class HomeScreenState extends State<HomeScreen> {
         userName = userData['name'] ?? 'Guest'; // Fetch user name
         profileImageUrl = userData['imageUrl'] ?? 'https://via.placeholder.com/150'; // Fetch user profile image URL
       });
-      bool approvedStatus = userData['approved'] ?? false; // Fetch user name
+      bool approvedStatus = userData['approved'] ?? false; // Fetch user approved  status
       if(!approvedStatus){
         showDialog(
           context: context,
@@ -53,9 +54,7 @@ class HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffEEF1F3),
-
       body: SingleChildScrollView(
-
         child: SafeArea(
           child: ResponsiveWidget(
             maxWidth: 600.0,
@@ -100,8 +99,10 @@ class HomeScreenState extends State<HomeScreen> {
                         IconButton(
                           icon: const Icon(Icons.logout),
                           onPressed: () async {
-                            await FirebaseAuth.instance.signOut(); // Sign out the user
-                            Navigator.pushReplacementNamed(context, '/sigIn'); // Redirect to signin screen
+
+                            logoutUser(context);
+
+
                           },
                         ),
                       ],
@@ -226,6 +227,11 @@ class HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  void logoutUser(BuildContext context)async {
+    await FirebaseAuth.instance.signOut(); // Sign out the user
+    Navigator.pushReplacementNamed(context, '/sigIn'); // Redirect to signin screen
+  }
 }
 
 class ApprovalDialog extends StatelessWidget {
@@ -254,4 +260,5 @@ class ApprovalDialog extends StatelessWidget {
     );
   }
 }
+
 

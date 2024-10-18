@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:telex/common/responsive_widget.dart';
 
 class ApprovalDialog extends StatelessWidget {
   @override
@@ -111,52 +112,55 @@ class _TicTacToeGameState extends State<TicTacToeGame> {
       appBar: AppBar(
         title: Text('Tic Tac Toe'),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(
-            child: GridView.builder(
-              padding: EdgeInsets.all(16.0),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-              ),
-              itemCount: 9,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () => handleTap(index),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.blueAccent,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Center(
-                      child: Text(
-                        game.board[index],
-                        style: TextStyle(fontSize: 64, color: Colors.white),
+      body: ResponsiveWidget(
+        maxWidth: 600,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: GridView.builder(
+                padding: EdgeInsets.all(16.0),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                ),
+                itemCount: 9,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () => handleTap(index),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.blueAccent,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: Text(
+                          game.board[index],
+                          style: TextStyle(fontSize: 64, color: Colors.white),
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-          SizedBox(height: 20),
-          if (game.winner.isNotEmpty)
-            Text(
-              '${game.winner} Wins!',
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+            SizedBox(height: 20),
+            if (game.winner.isNotEmpty)
+              Text(
+                '${game.winner} Wins!',
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+              ),
+            ElevatedButton(
+              onPressed: handleReset,
+              child: Text('Restart Game'),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                textStyle: TextStyle(fontSize: 20),
+              ),
             ),
-          ElevatedButton(
-            onPressed: handleReset,
-            child: Text('Restart Game'),
-            style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              textStyle: TextStyle(fontSize: 20),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

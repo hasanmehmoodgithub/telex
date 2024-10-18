@@ -5,6 +5,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 
+import 'package:telex/common/responsive_widget.dart';
+
 class CreateGroupScreen extends StatefulWidget {
   @override
   _CreateGroupScreenState createState() => _CreateGroupScreenState();
@@ -27,83 +29,86 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         title: Text("Create Group"),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              // Group Name
-              TextFormField(
-                controller: _groupNameController,
-                decoration: InputDecoration(
-                  labelText: 'Group Name',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a group name';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // Group Description
-              TextFormField(
-                controller: _groupDescriptionController,
-                decoration: InputDecoration(
-                  labelText: 'Group Description',
-                  border: OutlineInputBorder(),
-                ),
-                maxLines: 3,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a description';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // Group Image
-              if (_groupImageUrl != null)
-                Image.file(File(_groupImageUrl!), height: 100, fit: BoxFit.cover),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: _pickImage,
-                child: Text("Pick Group Image (optional)"),
-              ),
-              const SizedBox(height: 16),
-
-              // Private Group Toggle
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Checkbox(
-                    value: _isPrivate,
-                    onChanged: (value) {
-                      setState(() {
-                        _isPrivate = value!;
-                      });
-                    },
+      body: ResponsiveWidget(
+        maxWidth: 600.0,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              children: [
+                // Group Name
+                TextFormField(
+                  controller: _groupNameController,
+                  decoration: InputDecoration(
+                    labelText: 'Group Name',
+                    border: OutlineInputBorder(),
                   ),
-                  Text("Private Group"),
-                ],
-              ),
-
-              // Create Group Button
-              ElevatedButton(
-                onPressed: _isLoading ? null : _createGroup, // Disable button when loading
-                child: _isLoading
-                    ? CircularProgressIndicator(color: Colors.white) // Show loading indicator
-                    : Text("Create Group"),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  textStyle: const TextStyle(fontSize: 16),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a group name';
+                    }
+                    return null;
+                  },
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+
+                // Group Description
+                TextFormField(
+                  controller: _groupDescriptionController,
+                  decoration: InputDecoration(
+                    labelText: 'Group Description',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 3,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a description';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Group Image
+                if (_groupImageUrl != null)
+                  Image.file(File(_groupImageUrl!), height: 100, fit: BoxFit.cover),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: _pickImage,
+                  child: Text("Pick Group Image (optional)"),
+                ),
+                const SizedBox(height: 16),
+
+                // Private Group Toggle
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Checkbox(
+                      value: _isPrivate,
+                      onChanged: (value) {
+                        setState(() {
+                          _isPrivate = value!;
+                        });
+                      },
+                    ),
+                    Text("Private Group"),
+                  ],
+                ),
+
+                // Create Group Button
+                ElevatedButton(
+                  onPressed: _isLoading ? null : _createGroup, // Disable button when loading
+                  child: _isLoading
+                      ? CircularProgressIndicator(color: Colors.white) // Show loading indicator
+                      : Text("Create Group"),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    textStyle: const TextStyle(fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

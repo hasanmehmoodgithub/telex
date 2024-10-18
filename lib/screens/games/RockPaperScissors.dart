@@ -1,6 +1,7 @@
 // lib/rock_paper_scissors.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:telex/common/responsive_widget.dart';
 
 class RockPaperScissors extends StatefulWidget {
   @override
@@ -36,33 +37,36 @@ class _RockPaperScissorsState extends State<RockPaperScissors> {
       appBar: AppBar(
         title: Text('Rock, Paper, Scissors'),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Your Choice: $userChoice',
-            style: TextStyle(fontSize: 20),
-          ),
-          Text(
-            'Computer\'s Choice: $computerChoice',
-            style: TextStyle(fontSize: 20),
-          ),
-          Text(
-            result,
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(onPressed: () => playGame('Rock'), child: Text('Rock')),
-              SizedBox(width: 10),
-              ElevatedButton(onPressed: () => playGame('Paper'), child: Text('Paper')),
-              SizedBox(width: 10),
-              ElevatedButton(onPressed: () => playGame('Scissors'), child: Text('Scissors')),
-            ],
-          ),
-        ],
+      body: ResponsiveWidget(
+        maxWidth: 600,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Your Choice: $userChoice',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              'Computer\'s Choice: $computerChoice',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              result,
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(onPressed: () => playGame('Rock'), child: Text('Rock')),
+                SizedBox(width: 10),
+                ElevatedButton(onPressed: () => playGame('Paper'), child: Text('Paper')),
+                SizedBox(width: 10),
+                ElevatedButton(onPressed: () => playGame('Scissors'), child: Text('Scissors')),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

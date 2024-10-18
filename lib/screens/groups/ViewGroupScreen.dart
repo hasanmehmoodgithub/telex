@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:telex/common/responsive_widget.dart';
 import 'package:telex/screens/groups/CreatePostScreen.dart';
 import 'package:telex/screens/groups/widgets/PostWidget.dart';
 
@@ -61,29 +62,32 @@ class ViewGroupScreenState extends State<ViewGroupScreen> {
     return Scaffold(
 
       appBar: AppBar(title: const Text("Group Details")),
-      body: FutureBuilder<Map<String, dynamic>?>(
-        future: _groupDetailsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return _buildShimmerLoading();
-          } else if (snapshot.hasError) {
-            return const Center(child: Text("Error loading group details"));
-          } else if (!snapshot.hasData) {
-            return const Center(child: Text("Group not found"));
-          }
+      body: ResponsiveWidget(
+        maxWidth: 600.0,
+        child: FutureBuilder<Map<String, dynamic>?>(
+          future: _groupDetailsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return _buildShimmerLoading();
+            } else if (snapshot.hasError) {
+              return const Center(child: Text("Error loading group details"));
+            } else if (!snapshot.hasData) {
+              return const Center(child: Text("Group not found"));
+            }
 
-          final group = snapshot.data!;
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                groupBannerWidget(group),
-                FetchGroupPosts(groupId: widget.groupId),
-                const SizedBox(height: 16),
-              ],
-            ),
-          );
-        },
+            final group = snapshot.data!;
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  groupBannerWidget(group),
+                  FetchGroupPosts(groupId: widget.groupId),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            );
+          },
+        ),
       ),
      floatingActionButton: _isJoined ?  FloatingActionButton(
         onPressed:  _createPost,// Only allow posting if user has joined the group

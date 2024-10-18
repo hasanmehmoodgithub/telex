@@ -5,6 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
+import 'package:telex/common/responsive_widget.dart';
+
 class CreatePostScreen extends StatefulWidget {
   final String groupId; // Group ID to associate the post with
 
@@ -30,72 +32,75 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       appBar: AppBar(
         title: const Text("Create Post"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Post Title
-              TextFormField(
-                controller: _titleController,
-                decoration: const InputDecoration(labelText: 'Title'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a title';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
+      body: ResponsiveWidget(
+        maxWidth: 600.0,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Post Title
+                TextFormField(
+                  controller: _titleController,
+                  decoration: const InputDecoration(labelText: 'Title'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a title';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
 
-              // Post Description
-              TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Description'),
-                maxLines: 3,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a description';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
+                // Post Description
+                TextFormField(
+                  controller: _descriptionController,
+                  decoration: const InputDecoration(labelText: 'Description'),
+                  maxLines: 3,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a description';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
 
-              // Post Image
-              _localImageFile != null
-                  ? Image.file(_localImageFile!, height: 100) // Display locally selected image
-                  : Container(),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: _pickImage,
-                child: const Text("Pick Post Image (optional)"),
-              ),
-              const SizedBox(height: 16),
+                // Post Image
+                _localImageFile != null
+                    ? Image.file(_localImageFile!, height: 100) // Display locally selected image
+                    : Container(),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: _pickImage,
+                  child: const Text("Pick Post Image (optional)"),
+                ),
+                const SizedBox(height: 16),
 
-              // Anonymous Post Toggle
-              Row(
-                children: [
-                  Checkbox(
-                    value: _isAnonymous,
-                    onChanged: (value) {
-                      setState(() {
-                        _isAnonymous = value!;
-                      });
-                    },
-                  ),
-                  const Text("Post Anonymously"),
-                ],
-              ),
+                // Anonymous Post Toggle
+                Row(
+                  children: [
+                    Checkbox(
+                      value: _isAnonymous,
+                      onChanged: (value) {
+                        setState(() {
+                          _isAnonymous = value!;
+                        });
+                      },
+                    ),
+                    const Text("Post Anonymously"),
+                  ],
+                ),
 
-              // Create Post Button
-              ElevatedButton(
-                onPressed: _createPost,
-                child: const Text("Create Post"),
-              ),
-            ],
+                // Create Post Button
+                ElevatedButton(
+                  onPressed: _createPost,
+                  child: const Text("Create Post"),
+                ),
+              ],
+            ),
           ),
         ),
       ),

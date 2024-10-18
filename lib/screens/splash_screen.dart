@@ -22,7 +22,9 @@ class SplashScreenState extends State<SplashScreen> {
     // Add a small delay for the splash screen
     await Future.delayed(const Duration(seconds: 1));
     // Check if user is logged in
+
     User? user = FirebaseAuth.instance.currentUser;
+
     if (user != null) {
       // If logged in, navigate to home screen
       Navigator.pushReplacementNamed(context, '/home');
@@ -34,15 +36,9 @@ class SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-
-          child:
-          Padding(padding: const EdgeInsets.all(50),child:  Image.asset(
-              Assets.imgF2
-
-          ),)
-      ),
+    return Scaffold(body: Center(
+      child: Image.asset(
+          Assets.imgF2),),
     );
   }
 }
