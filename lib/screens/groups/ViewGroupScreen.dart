@@ -173,23 +173,47 @@ class ViewGroupScreenState extends State<ViewGroupScreen> {
               ],
             ),
           ),
-          _isJoined?   Align(
+          group['createdBy']==FirebaseAuth.instance.currentUser?.uid?InkWell(
+              onTap: (){
+
+              },
+              child:MaterialButton(
+                  color: Colors.white.withOpacity(0.3),
+                  onPressed: (){
+                    deleteGroup(widget.groupId);
+
+                    },
+                  child: const Text("Delete Group"))):_isJoined?   Align(
             alignment: Alignment.topRight,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: MaterialButton(
-                color: Colors.white.withOpacity(0.3),
-                onPressed: (){leaveGroup(context,widget.groupId,FirebaseAuth.instance.currentUser!.uid);},
+                  color: Colors.white.withOpacity(0.3),
+                  onPressed: (){leaveGroup(context,widget.groupId,FirebaseAuth.instance.currentUser!.uid);},
                   child: const Text("Leave Group")),
             ),
           )
-              :const SizedBox()
+              :const SizedBox(),
+
 
         ],
       ),
     );
   }
-
+  Future<void> deleteGroup(String groupId) async {
+    try {
+      await FirebaseFirestore.instance.collection('groups').doc(groupId).delete();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Group deleted successfully')),
+      );
+      Navigator.pop(context);
+      Navigator.pushReplacementNamed(context, "/groups");
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting group: $e')),
+      );
+    }
+  }
   Widget _buildShimmerLoading() {
     return Shimmer.fromColors(
       baseColor: Colors.grey[300]!,
