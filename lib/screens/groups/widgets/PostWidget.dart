@@ -92,7 +92,7 @@ class _PostWidgetState extends State<PostWidget> {
   Widget _buildUserInfo() {
     final currentUser = FirebaseAuth.instance.currentUser;
     final isCurrentUserPost = currentUser?.uid == widget.post['createdBy'];
-
+    bool  isAnonymous= widget.post['isAnonymous'];
     return Row(
       children: [
         InkWell(
@@ -114,7 +114,7 @@ class _PostWidgetState extends State<PostWidget> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
-              userName ?? '-----',
+              isAnonymous?"Anonymous":  userName ?? '-----',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             Text(
