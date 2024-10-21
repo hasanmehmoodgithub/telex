@@ -4,9 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:telex/common/custom_form_button.dart';
 import 'package:telex/common/responsive_widget.dart';
 import 'package:telex/screens/groups/CreatePostScreen.dart';
 import 'package:telex/screens/groups/widgets/PostWidget.dart';
+import 'package:telex/utils/media_query_extension.dart';
 
 class ViewGroupScreen extends StatefulWidget {
   final String groupId;
@@ -63,30 +65,34 @@ class ViewGroupScreenState extends State<ViewGroupScreen> {
 
       appBar: AppBar(title: const Text("Group Details")),
       body: ResponsiveWidget(
-        maxWidth: 600.0,
-        child: FutureBuilder<Map<String, dynamic>?>(
-          future: _groupDetailsFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return _buildShimmerLoading();
-            } else if (snapshot.hasError) {
-              return const Center(child: Text("Error loading group details"));
-            } else if (!snapshot.hasData) {
-              return const Center(child: Text("Group not found"));
-            }
 
-            final group = snapshot.data!;
-            return SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  groupBannerWidget(group),
-                  FetchGroupPosts(groupId: widget.groupId),
-                  const SizedBox(height: 16),
-                ],
-              ),
-            );
-          },
+        maxWidth: 600.0,
+        child: Container(
+          height: context.screenHeight,
+          child: FutureBuilder<Map<String, dynamic>?>(
+            future: _groupDetailsFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return _buildShimmerLoading();
+              } else if (snapshot.hasError) {
+                return const Center(child: Text("Error loading group details"));
+              } else if (!snapshot.hasData) {
+                return const Center(child: Text("Group not found"));
+              }
+
+              final group = snapshot.data!;
+              return SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    groupBannerWidget(group),
+                    FetchGroupPosts(groupId: widget.groupId),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
      floatingActionButton: _isJoined ?  FloatingActionButton(
