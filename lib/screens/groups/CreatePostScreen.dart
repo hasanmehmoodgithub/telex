@@ -173,9 +173,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         'imageUrl': _postImageUrl, // Add the uploaded image URL
         'isAnonymous': _isAnonymous,
         'createdDate': Timestamp.now(),
-        'createdBy': _isAnonymous
-            ? 'Anonymous'
-            : FirebaseAuth.instance.currentUser!.uid, // Replace with actual user ID
+        'createdBy':FirebaseAuth.instance.currentUser!.uid, // Replace with actual user ID
         'likes': [],
         'likeCount': 0, // Initialize with 0 for like count
         'comments': [], // Initialize with an empty list for comments

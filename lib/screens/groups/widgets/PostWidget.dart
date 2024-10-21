@@ -104,7 +104,7 @@ class _PostWidgetState extends State<PostWidget> {
       );
           },
           child: CircleAvatar(
-            backgroundImage: NetworkImage(userImageUrl ?? ''),
+            backgroundImage: NetworkImage(isAnonymous?"https://cdn4.iconfinder.com/data/icons/people-14/24/Anonymous-2-512.png":userImageUrl ?? ''),
             radius: 24,
           ),
         ),
